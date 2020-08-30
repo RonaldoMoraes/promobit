@@ -16,7 +16,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
+        <testsuite name="- Promobit jobtest suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
