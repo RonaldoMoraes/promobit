@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,9 +18,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private $passwordEncoder;
+    public function __construct(ManagerRegistry $registry, UserPasswordEncoderInterface $passwordEncoder)
     {
         parent::__construct($registry, User::class);
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    private function encodePassword(string &$password)
+    {
+        $password = $this->passwordEncoder->encodePassword(
+            new User,
+            $password
+        );
     }
 
     /**
@@ -36,19 +47,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    public function store(string $name, string $email, string $phone, string $password){
-        $newUser = new User();
+    public function store(array $data){
+        $user = new User();
 
-        $newUser
-            ->setName($name)
-            ->setEmail($email)
-            ->setPassword($password)
-            ->setPhone($phone);
+        $this->encodePassword($data['password']);
 
-        $this->_em->persist($newUser);
+        $user
+            ->setName($data['name'])
+            ->setEmail($data['email'])
+            ->setPassword($data['password'])
+            ->setPhone($data['phone'])
+        ;
+
+        $this->_em->persist($user);
         $this->_em->flush();
         
-        return $newUser;
+        return $user;
     }
 
     // /**
@@ -68,6 +82,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
     */
 
+    /**
+     * @return User | null - Returns an array of User objects
+     */
     public function findByEmail($email): ?User
     {
         return $this->createQueryBuilder('user')

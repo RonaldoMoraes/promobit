@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Doctrine\DBAL\UniqueConstraintViolationException;
-// use \Doctrine\ORM\EntityManager;
 
 class UserTest extends KernelTestCase
 {
@@ -39,7 +38,7 @@ class UserTest extends KernelTestCase
     {
         $data = $user ?? $this->userMock;
 
-        $newUser = $this->userRepository->store($data['name'], $data['email'], $data['phone'], $data['password']);
+        $newUser = $this->userRepository->store($data);
 
         return $newUser;
     }
