@@ -36,6 +36,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function store(string $name, string $email, string $phone, string $password){
+        $newUser = new User();
+
+        $newUser
+            ->setName($name)
+            ->setEmail($email)
+            ->setPassword($password)
+            ->setPhone($phone);
+
+        $this->_em->persist($newUser);
+        $this->_em->flush();
+        
+        return $newUser;
+    }
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */
@@ -53,6 +68,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
     */
 
+    public function findByEmail($email): ?User
+    {
+        return $this->createQueryBuilder('user')
+            ->andWhere('user.email = :val')
+            ->setParameter('val', $email)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    
     /*
     public function findOneBySomeField($value): ?User
     {
