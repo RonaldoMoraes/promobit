@@ -10,19 +10,19 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
     (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 }
 
-if (isset($_ENV['BOOTSTRAP_RESET_DATABASE']) && $_ENV['BOOTSTRAP_RESET_DATABASE'] == true) {
-    echo "Resetting test database...";
-    passthru(sprintf(
-        'php "%s/../bin/console" doctrine:schema:drop --env=test --force --no-interaction',
-        __DIR__
-    ));
-    passthru(sprintf(
-        'php "%s/../bin/console" doctrine:schema:update --env=test --force --no-interaction',
-        __DIR__
-    ));
-    passthru(sprintf(
-        'php "%s/../bin/console" doctrine:fixtures:load --env=test --no-interaction',
-        __DIR__
-    ));
-    echo " Done" . PHP_EOL . PHP_EOL;
-}
+// if (isset($_ENV['BOOTSTRAP_RESET_DATABASE']) && $_ENV['BOOTSTRAP_RESET_DATABASE'] == true) {
+//     echo "Resetting test database...";
+//     passthru(sprintf(
+//         'php "%s/../bin/console" doctrine:schema:drop --env=test --force --no-interaction',
+//         __DIR__
+//     ));
+//     passthru(sprintf(
+//         'php "%s/../bin/console" doctrine:schema:update --env=test --force --no-interaction',
+//         __DIR__
+//     ));
+//     passthru(sprintf(
+//         'php "%s/../bin/console" doctrine:fixtures:load --env=test --no-interaction',
+//         __DIR__
+//     ));
+//     echo " Done" . PHP_EOL . PHP_EOL;
+// }
