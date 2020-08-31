@@ -20,12 +20,12 @@ php bin/console doctrine:migrations:migrate
   
 
 ### Authentication & Firewalls
-
+> https://symfony.com/doc/current/security/guard_authentication.html#createtoken
 > https://symfony.com/doc/current/security.html#a-authentication-firewalls
+> https://smoqadam.me/posts/how-to-authenticate-user-in-symfony-5-by-jwt/#prerequisites
 > https://medium.com/@walderlansena/como-configurar-autentica%C3%A7%C3%A3o-jwt-com-symfony-4-4f62a10fe24c
 
   
-
 ### Reset password
 > https://symfony.com/doc/current/security/reset_password.html
 
