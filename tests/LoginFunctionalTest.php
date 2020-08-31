@@ -7,7 +7,7 @@ use App\Entity\User;
 use Doctrine\DBAL\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class UserFunctionalTest extends WebTestCase
+class LoginFunctionalTest extends WebTestCase
 {
     private $userMock;
 
@@ -22,7 +22,8 @@ class UserFunctionalTest extends WebTestCase
 
         parent::setUp();
     }
-    
+
+    // TO DO: Separate this method in a Fixture
     private function registerUser($client)
     {
         $request = array(
@@ -37,19 +38,34 @@ class UserFunctionalTest extends WebTestCase
         $client->request(...$request);
     }
 
+    private function loginUser($client)
+    {
+        $request = array(
+            'POST',
+            '/api/login',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode(array('email' => $this->userMock['email'], 'password' => $this->userMock['password']))
+        );        
+
+        $client->request(...$request);
+    }
+
     // [ FUNCTIONAL TEST ]
-    public function testFStore()
+    public function testFLogin()
     {
         $clientFirst = static::createClient();
         $clientSecond = clone($clientFirst);
 
-        // Can create the first time
         $this->registerUser($clientFirst);
-        $this->assertEquals(201, $clientFirst->getResponse()->getStatusCode());
-        
-        // But not with the same infos (email is unique)
-        $this->registerUser($clientSecond);
-        $this->assertEquals(500, $clientSecond->getResponse()->getStatusCode());
+        $this->loginUser($clientSecond);
+
+        $response = $clientSecond->getResponse();
+        $respondeData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertArrayHasKey('token', $respondeData['data']);
     }
 
 }

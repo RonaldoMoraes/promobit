@@ -8,9 +8,6 @@ use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use App\Entity\User;
 
 class UserController extends AbstractController
 {
@@ -22,7 +19,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users", name="store_user", methods={"POST"})
+     * @Route("/api/register", name="store_user", methods={"POST"})
      */
     public function store(Request $request): JsonResponse
     {
