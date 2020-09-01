@@ -28,7 +28,7 @@ php bin/console doctrine:migrations:migrate
   
 ### Reset password
 > https://symfony.com/doc/current/security/reset_password.html
-
+> https://symfony.com/doc/current/mailer.html
   
 
 ### Testing

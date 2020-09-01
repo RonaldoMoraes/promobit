@@ -67,6 +67,18 @@ class UserTest extends KernelTestCase
         $this->assertEquals($this->userMock, $user->toArray());
     }
 
+    // [ INTEGRATION TEST ]
+    public function testIShow()
+    {
+        // Store user and get it's values
+        $user = $this->store();
+
+        // Find that same user by it's ID
+        $userFound = $this->userRepository->find($user->getId());
+
+        $this->assertSame($user, $userFound);
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();

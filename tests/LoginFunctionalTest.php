@@ -62,10 +62,10 @@ class LoginFunctionalTest extends WebTestCase
         $this->loginUser($clientSecond);
 
         $response = $clientSecond->getResponse();
-        $respondeData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('token', $respondeData['data']);
+        $this->assertArrayHasKey('token', $responseData['data']);
     }
 
 }
