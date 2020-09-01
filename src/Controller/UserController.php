@@ -34,7 +34,24 @@ class UserController extends AbstractController
 
             return new JsonResponse(['data' => $user->toArray()], Response::HTTP_CREATED);
         } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'User could not be created.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['message' => 'User could not be created due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @Route("/api/users/{id}", name="show_user", methods={"GET"})
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            if(!$user = $this->userRepository->show($id))
+            {
+                return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            return new JsonResponse(['data' => $user->toArray()], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

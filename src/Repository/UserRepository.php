@@ -47,6 +47,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    /**
+     * Stores user on database
+     */
     public function store(array $data){
         $user = new User();
 
@@ -64,6 +67,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         
         return $user;
     }
+
+    /**
+     * Get user on database by it's ID
+     */
+    public function show(int $id){
+        $user = $this->find($id);
+        return $user;
+    }
+
+
 
     // /**
     //  * @return User[] Returns an array of User objects
