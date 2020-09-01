@@ -30,6 +30,7 @@ class UserFunctionalTest extends WebTestCase
         $response = $client->getResponse();
         $responseData = json_decode($response->getContent(), true);
         // Because of this:
+        // dd($responseData);
         $data = $responseData['data'];
 
         return $data;
@@ -49,7 +50,21 @@ class UserFunctionalTest extends WebTestCase
         $client->request(...$request);
     }
 
-    private function showUser($client, $id)
+    private function updateUser($client, array $params)
+    {
+        $request = array(
+            'PUT',
+            "/api/users/" . $params['id'],
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($params['data'])
+        );        
+
+        $client->request(...$request);
+    }
+
+    private function showUser($client, int $id)
     {
         $request = array(
             'GET',
@@ -86,9 +101,33 @@ class UserFunctionalTest extends WebTestCase
         $userFirst = $this->getDataFrom('registerUser', $clientFirst);
         $this->assertEquals(201, $clientFirst->getResponse()->getStatusCode());
         
-        $userSecond = $this->getDataFrom('showUser', $clientSecond, $userFirst['id'] ?? 0);
+        $userSecond = $this->getDataFrom('showUser', $clientSecond, $userFirst['id']);
         $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
         
         $this->assertEquals($userFirst, $userSecond);
+    }
+
+    // [ FUNCTIONAL TEST ]
+    public function testFSUpdate()
+    {
+        $clientFirst = static::createClient();
+        $clientSecond = clone($clientFirst);
+
+        $userFirst = $this->getDataFrom('registerUser', $clientFirst);
+        $this->assertEquals(201, $clientFirst->getResponse()->getStatusCode());
+
+        $params = array(
+            'id'    => $userFirst['id'],
+            'data'  => array(
+                "name"      => "Ronaldinho",
+                "email"     => "ronaldinho@mail.com",
+                "phone"     => "35991458401",
+                "password"  => "aloalo123"
+                )
+            );
+        json_encode($params);
+
+        $this->updateUser($clientSecond, $params);
+        $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
     }
 }

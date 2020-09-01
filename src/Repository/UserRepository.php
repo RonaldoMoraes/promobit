@@ -76,7 +76,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $user;
     }
 
+    /**
+     * Update user on database
+     */
+    public function update(User $user, array $data){
 
+        if (!empty($data['name'])) $user->setName($data['name']);
+        if (!empty($data['email'])) $user->setEmail($data['email']);
+        if (!empty($data['phone'])) $user->setPhone($data['phone']);
+        if (!empty($data['password'])) $this->encodePassword($data['password']) && $user->setPassword($data['password']);
+        
+        $this->_em->flush();
+        
+        return $user;
+    }
 
     // /**
     //  * @return User[] Returns an array of User objects
