@@ -60,7 +60,7 @@ class UserController extends AbstractController
      */
     public function update(int $id, Request $request): JsonResponse
     {
-        // try {
+        try {
             $data = json_decode($request->getContent(), true);
             $data = array_filter(['name', 'email', 'phone', 'password']);
 
@@ -71,8 +71,26 @@ class UserController extends AbstractController
             $this->userRepository->update($user, $data);
 
             return new JsonResponse(['data' => []], Response::HTTP_OK);
-        // } catch (\Exception $e) {
-        //     return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        // }
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'User could not be updated due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @Route("/api/users/{id}", name="delete_user", methods={"DELETE"})
+     */
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            if(!$user = $this->userRepository->find($id))
+            {
+                return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
+            }
+            $this->userRepository->delete($user);
+
+            return new JsonResponse(['data' => []], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'User could not be deleted due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

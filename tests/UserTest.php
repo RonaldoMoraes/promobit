@@ -92,13 +92,29 @@ class UserTest extends KernelTestCase
             'password' =>   'aloalo123'
         ];
 
+        // TO DO: Assert $userUpdated is true
         $userUpdated = $this->userRepository->update($user, $newDataMock);
 
-        $userUpdatedArray = $userUpdated->toArray();
+        $userUpdatedArray = $this->userRepository->find($user->getId())->toArray();
         unset($newDataMock['password']);
         unset($userUpdatedArray['id']);
 
         $this->assertEquals($newDataMock, $userUpdatedArray);
+    }
+
+    // [ INTEGRATION TEST ]
+    public function testIDelete()
+    {
+        // Store user and get it's values
+        $user = $this->store();
+        $userId = $user->getId();
+
+        $deteled = $this->userRepository->delete($user);
+
+        $notFound = $this->userRepository->find($userId);
+
+        $this->assertTrue($deteled);
+        $this->assertNull($notFound);
     }
 
     protected function tearDown(): void

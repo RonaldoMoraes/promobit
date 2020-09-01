@@ -36,6 +36,12 @@ class UserFunctionalTest extends WebTestCase
         return $data;
     }
 
+    // private function callRequest($client, $method, $url, $data = [], $mock = false)
+    // {
+    //     $data = $mock ? json_encode($this->userMock) : json_encode($data);
+    //     $client->request($method, $url, [], [], ['CONTENT_TYPE' => 'application/json'], $data);
+    // }
+    
     private function registerUser($client)
     {
         $request = array(
@@ -59,6 +65,19 @@ class UserFunctionalTest extends WebTestCase
             [],
             ['CONTENT_TYPE' => 'application/json'],
             json_encode($params['data'])
+        );        
+
+        $client->request(...$request);
+    }
+
+    private function deleteUser($client, int $id)
+    {
+        $request = array(
+            'DELETE',
+            "/api/users/$id",
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );        
 
         $client->request(...$request);
@@ -125,9 +144,21 @@ class UserFunctionalTest extends WebTestCase
                 "password"  => "aloalo123"
                 )
             );
-        json_encode($params);
 
         $this->updateUser($clientSecond, $params);
+        $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
+    }
+
+    // [ FUNCTIONAL TEST ]
+    public function testFSDelete()
+    {
+        $clientFirst = static::createClient();
+        $clientSecond = clone($clientFirst);
+
+        $userFirst = $this->getDataFrom('registerUser', $clientFirst);
+        $this->assertEquals(201, $clientFirst->getResponse()->getStatusCode());
+
+        $this->deleteUser($clientSecond, $userFirst['id']);
         $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
     }
 }
