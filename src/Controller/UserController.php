@@ -25,7 +25,7 @@ class UserController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-
+            
             if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
                 return new JsonResponse(['message' => 'Expecting mandatory parameters'], Response::HTTP_BAD_REQUEST);
             }
@@ -53,5 +53,26 @@ class UserController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * @Route("/api/users/{id}", name="update_user", methods={"PUT"})
+     */
+    public function update(int $id, Request $request): JsonResponse
+    {
+        // try {
+            $data = json_decode($request->getContent(), true);
+            $data = array_filter(['name', 'email', 'phone', 'password']);
+
+            if(!$user = $this->userRepository->find($id))
+            {
+                return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
+            }
+            $this->userRepository->update($user, $data);
+
+            return new JsonResponse(['data' => []], Response::HTTP_OK);
+        // } catch (\Exception $e) {
+        //     return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        // }
     }
 }
