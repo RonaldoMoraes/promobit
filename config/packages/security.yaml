@@ -23,9 +23,10 @@ security:
         #         authenticators:
         #             - AppBundle\Security\Guard\Token\ApiTokenGuard
         main:
-            anonymous: true
+            anonymous: false
             lazy: true
-            pattern: ^/api(?!/register)
+            pattern: ^\/api(?!\/(register|login))
+            # pattern: ^/api(?!/register)
             guard:
                 authenticators:
                     - App\Security\JwtAuthenticator
