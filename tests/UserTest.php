@@ -43,7 +43,7 @@ class UserTest extends KernelTestCase
         return $newUser;
     }
 
-    // [ UNIT TEST ]
+    // [ INTEGRATION TEST ]
     public function testUStore()
     {
         $user = $this->store();

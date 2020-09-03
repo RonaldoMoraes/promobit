@@ -30,7 +30,6 @@ class UserFunctionalTest extends WebTestCase
         $response = $client->getResponse();
         $responseData = json_decode($response->getContent(), true);
         // Because of this:
-        // dd($responseData);
         $data = $responseData['data'];
 
         return $data;
@@ -82,10 +81,9 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/" . $params['id'],
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'AUTHORIZATION' => "Bearer $token"],
+            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"],
             json_encode($params['data'])
         );        
-        // dd($params['data']);
         $client->request(...$request);
     }
 
@@ -98,7 +96,7 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'AUTHORIZATION' => "Bearer $token"]
+            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"]
         );        
 
         $client->request(...$request);
@@ -113,7 +111,7 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'AUTHORIZATION' => "Bearer $token"]
+            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"]
         );        
         $client->request(...$request);
     }
@@ -168,7 +166,6 @@ class UserFunctionalTest extends WebTestCase
         );
         $this->updateUser($clientSecond, $params);
         $aux1 = $clientSecond->getResponse();
-        dd($aux1->getContent());
         $this->assertEquals(200, $aux1->getStatusCode());
     }
 
