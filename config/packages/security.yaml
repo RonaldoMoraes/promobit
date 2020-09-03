@@ -19,7 +19,7 @@ security:
             anonymous: false
             stateless: true
             lazy: true
-            pattern: ^/api(?!/(register|login))
+            pattern: ^/api(?!/(register|login|doc))
             guard:
                 authenticators:
                     - App\Security\JwtAuthenticator
