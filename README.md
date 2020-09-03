@@ -52,7 +52,7 @@ O teste foi desenvolvido com as seguintes ferramentas:
 - Nginx
 - Docker 19.03 & Docker Compose 1.26.2
 
-## Documentação
+## 🗎 Documentação
 
 [Postman](https://documenter.getpostman.com/view/3747276/TVCgxS4X) - published
 
