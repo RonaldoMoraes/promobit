@@ -15,18 +15,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        # api:
-        #     pattern: ^/api
-        #     anonymous: ~
-        #     stateless: true
-        #     guard:
-        #         authenticators:
-        #             - AppBundle\Security\Guard\Token\ApiTokenGuard
         main:
             anonymous: false
+            stateless: true
             lazy: true
-            pattern: ^\/api(?!\/(register|login))
-            # pattern: ^/api(?!/register)
+            pattern: ^/api(?!/(register|login))
             guard:
                 authenticators:
                     - App\Security\JwtAuthenticator

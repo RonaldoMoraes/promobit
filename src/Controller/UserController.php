@@ -25,6 +25,7 @@ class UserController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
+            $data = array_intersect_key($data, array_flip(['name', 'email', 'phone', 'password']));
             
             if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
                 return new JsonResponse(['message' => 'Expecting mandatory parameters'], Response::HTTP_BAD_REQUEST);
@@ -62,7 +63,7 @@ class UserController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-            $data = array_filter(['name', 'email', 'phone', 'password']);
+            $data = array_intersect_key($data, array_flip(['name', 'email', 'phone', 'password']));
 
             if(!$user = $this->userRepository->find($id))
             {
