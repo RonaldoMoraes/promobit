@@ -30,7 +30,8 @@ API RESTful com:
   - Delete
   - List (*brinde)
 - Login
-- Recuperação de senha
+- Recuperação de senha. Página: **localhost:8081/reset-password**
+ > Para recuperar a senha é necessário configurar o .env com configs do gmail/mandrill/mailgun
 
 Utilizando também de:
 - TDD
@@ -97,6 +98,9 @@ $ cd promobit
 # Configure as variáveis de ambiente
 $ cp .env.example .env
 
+# Configure as variáveis de ambiente
+$ cp src/.env.example src/.env
+
 # Rode o docker-compose
 $ docker-compose up -d
 
@@ -114,6 +118,9 @@ $ cd promobit
 
 # Configure as variáveis de ambiente
 $ cp .env.example .env
+
+# Configure as variáveis de ambiente
+$ cp src/.env.example src/.env
 
 # Dê permissões de execução ao script
 $ chmod +x docker-rmk.sh
@@ -140,7 +147,11 @@ $ cd promobit/src
 # Configure as variáveis de ambiente teste
 $ cp .env.example .env.test
 
-$ php bin\phpunit
+# Instala as libs do projeto
+$ composer install
+
+# Roda os testes
+$ php bin/phpunit
 ```
 
 ### To Do (or should have done)
@@ -149,3 +160,4 @@ $ php bin\phpunit
 - Usar fixtures nos testes
 - Padronizar retorno da API com [JSEND](https://github.com/omniti-labs/jsend)
 - Melhorar validação dos requests (POSTs e PUT)
+- Melhorar variáveis de ambiente dos arquivos docker/compose
