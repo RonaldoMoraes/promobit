@@ -18,7 +18,7 @@ class AuthController extends AbstractController
      */
     public function login(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder)
     {
-        try {
+        // try {
             $data = json_decode($request->getContent(), true);
 
             $user = $userRepository->findByEmail($data['email']);
@@ -34,8 +34,8 @@ class AuthController extends AbstractController
             $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
 
             return new JsonResponse(['data' => ['token' => $jwt]], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'Could not login that user'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        // } catch (\Exception $e) {
+        //     return new JsonResponse(['message' => 'Could not login that user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        // }
     }
 }

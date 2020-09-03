@@ -81,7 +81,7 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/" . $params['id'],
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_Authorization' => "Bearer $token"],
             json_encode($params['data'])
         );        
         $client->request(...$request);
@@ -96,7 +96,7 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"]
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_Authorization' => "Bearer $token"]
         );        
 
         $client->request(...$request);
@@ -111,7 +111,7 @@ class UserFunctionalTest extends WebTestCase
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"]
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_Authorization' => "Bearer $token"]
         );        
         $client->request(...$request);
     }
