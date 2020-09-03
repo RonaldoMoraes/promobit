@@ -33,6 +33,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         );
     }
 
+    private function mapUsersArray($users): array
+    {
+        return array_map(function($user){
+            return $user->toArray();
+        }, $users);
+    }
+
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
@@ -45,6 +52,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newEncodedPassword);
         $this->_em->persist($user);
         $this->_em->flush();
+    }
+
+    /**
+     * List all users on database
+     */
+    public function listAll(){
+        $users = $this->findAll();
+        
+        return $this->mapUsersArray($users);
     }
 
     /**

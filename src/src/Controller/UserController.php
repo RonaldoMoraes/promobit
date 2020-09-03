@@ -21,6 +21,20 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Route("/api/users", name="index_user", methods={"GET"})
+     */
+    public function index(): JsonResponse
+    {
+        try {
+            $users = $this->userRepository->listAll();
+
+            return new JsonResponse(['data' => $users], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'Users could not be listed due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * @Route("/api/register", name="store_user", methods={"POST"})
      */
     public function store(Request $request): JsonResponse
