@@ -163,3 +163,4 @@ $ php bin/phpunit
 - Padronizar retorno da API com [JSEND](https://github.com/omniti-labs/jsend)
 - Melhorar validação dos requests (POSTs e PUT)
 - Melhorar variáveis de ambiente dos arquivos docker/compose
+- Para o envio de email, configurar mais DSNs e usar failover
