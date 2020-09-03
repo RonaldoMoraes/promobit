@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  database:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=promobit_dev
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    volumes:
+      - my-db:/var/lib/mysql
+      # - ./database/data:/var/lib/mysql
+      # - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  php-fpm:
+    build:
+      context: ./php-fpm
+    depends_on:
+      - database
+    environment:
+      - APP_ENV=dev
+      - APP_SECRET=24e17c47430bd2044a61c131c1cf6990
+      - DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@database:3306/${DATABASE_NAME}?serverVersion=8.0
+      - JWT_SECRET=megasecretphrase
+      # - DATABASE_URL=mysql://root:root@192.168.0.113:3306/promobit_dev?serverVersion=8.0.21
+    volumes:
+      - ./src:/var/www
+
+  nginx:
+    build:
+      context: ./nginx
+    volumes:
+      - ./src:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites/:/etc/nginx/sites-available
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+      - ./logs:/var/log
+    depends_on:
+      - php-fpm
+    ports:
+      - "8081:80"
+
+volumes:
+  my-db:

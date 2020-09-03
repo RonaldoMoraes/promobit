@@ -1,43 +1,31 @@
+## Requisitos
 
-# NOTES ABOUT DOCS
+- Docker
+- Docker Compose
 
-  
+## Como subir o projeto
 
-### Creating User
+Para subir o projeto, copie o arquivo .env.example e renomeie para .env
+
+Com a linha de comando na raiz do projeto:
+
+```docker-compose up -d```
+
+Abra o browser e acesse http://localhost:8081, se tudo der certo, verá a tela padrão do Symfony
+
+## Endpoints
+
+- /users (GET) - listagem de usuários
+- /users (POST) - Criação de um novo usuário
+- /users/{id} (GET) - Retorna um usuário
+- /users/{id} (PUT) - Altera um usuário
+- /users/{id} (DELETE) - Deleta um usuário
+
+Nos endpoints de criação e edição, mande os dados do usuário no body no fomato json, por exemplo:
 ```
-php bin/console make:user
-php bin/console make:entity
-php bin/console make:migration
-php bin/console doctrine:migrations:migrate
+{
+    "name": "person",
+    "email": "person@example.com",
+    "password": "p@ssword"
+}
 ```
-> https://symfony.com/doc/current/security.html#a-create-your-user-class
-
-  
-
-### Encode password
-> https://symfony.com/doc/current/security.html#c-encoding-passwords
-
-  
-
-### Authentication & Firewalls
-> https://symfony.com/doc/current/security/guard_authentication.html#createtoken
-> https://symfony.com/doc/current/security.html#a-authentication-firewalls
-> https://smoqadam.me/posts/how-to-authenticate-user-in-symfony-5-by-jwt/#prerequisites
-> https://medium.com/@walderlansena/como-configurar-autentica%C3%A7%C3%A3o-jwt-com-symfony-4-4f62a10fe24c
-
-  
-### Reset password
-> https://symfony.com/doc/current/security/reset_password.html
-> https://symfony.com/doc/current/mailer.html
-  
-
-### Testing
-
-```
-php bin/console make:unit-test
-php bin/console make:functional-test
-```
-<!-- > https://symfony.com/doc/current/create_framework/unit_testing.html -->
-> https://symfony.com/doc/current/testing/database.html
-> https://symfony.com/doc/current/testing.html#unit-tests
-> https://symfony.com/doc/current/testing.html#functional-tests
