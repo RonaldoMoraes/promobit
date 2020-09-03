@@ -49,6 +49,7 @@ O teste foi desenvolvido com as seguintes ferramentas:
 - Symfony 5.1
 - PHPUnit 7.5.20
 - MySQL 8 (docker) & Mariadb 10.3.10 (local)
+- Nginx
 - Docker 19.03 & Docker Compose 1.26.2
 
 ## Documentação
