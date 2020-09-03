@@ -30,7 +30,6 @@ class UserFunctionalTest extends WebTestCase
         $response = $client->getResponse();
         $responseData = json_decode($response->getContent(), true);
         // Because of this:
-        // dd($responseData);
         $data = $responseData['data'];
 
         return $data;
@@ -56,28 +55,48 @@ class UserFunctionalTest extends WebTestCase
         $client->request(...$request);
     }
 
-    private function updateUser($client, array $params)
+    private function loginUser($client)
     {
         $request = array(
-            'PUT',
-            "/api/users/" . $params['id'],
+            'POST',
+            '/api/login',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode($params['data'])
+            json_encode([
+                'email' => $this->userMock['email'],
+                'password' => $this->userMock['password']
+            ])
         );        
 
         $client->request(...$request);
     }
 
+    private function updateUser($client, array $params)
+    {
+        $loginClient = clone($client);
+        $token = $this->getDataFrom('loginUser', $loginClient)['token'];
+        $request = array(
+            'PUT',
+            "/api/users/" . $params['id'],
+            [],
+            [],
+            ['Authorization:' => "Bearer $token"],
+            json_encode($params['data'])
+        );
+        $client->request(...$request);
+    }
+
     private function deleteUser($client, int $id)
     {
+        $loginClient = clone($client);
+        $token = $this->getDataFrom('loginUser', $loginClient)['token'];
         $request = array(
             'DELETE',
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json']
+            ['CONTENT_TYPE' => 'application/json', 'Authorization' => "Bearer $token"]
         );        
 
         $client->request(...$request);
@@ -85,14 +104,15 @@ class UserFunctionalTest extends WebTestCase
 
     private function showUser($client, int $id)
     {
+        $loginClient = clone($client);
+        $token = $this->getDataFrom('loginUser', $loginClient)['token'];
         $request = array(
             'GET',
             "/api/users/$id",
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json']
-        );        
-
+            ['Authorization:' => "Bearer $token"],
+        );   
         $client->request(...$request);
     }
 
@@ -119,7 +139,7 @@ class UserFunctionalTest extends WebTestCase
 
         $userFirst = $this->getDataFrom('registerUser', $clientFirst);
         $this->assertEquals(201, $clientFirst->getResponse()->getStatusCode());
-        
+
         $userSecond = $this->getDataFrom('showUser', $clientSecond, $userFirst['id']);
         $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
         
@@ -142,11 +162,11 @@ class UserFunctionalTest extends WebTestCase
                 "email"     => "ronaldinho@mail.com",
                 "phone"     => "35991458401",
                 "password"  => "aloalo123"
-                )
-            );
-
+            )
+        );
         $this->updateUser($clientSecond, $params);
-        $this->assertEquals(200, $clientSecond->getResponse()->getStatusCode());
+        $aux1 = $clientSecond->getResponse();
+        $this->assertEquals(200, $aux1->getStatusCode());
     }
 
     // [ FUNCTIONAL TEST ]
