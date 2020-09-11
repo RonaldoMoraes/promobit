@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  mongodb:
+    build:
+      context: ./mongodb
+      dockerfile: Dockerfile
+      args:
+        - mongodb_username=${MONGODB_USERNAME}
+        - mongodb_password=${MONGODB_PASSWORD}
+        - mongodb_initdb_database=${MONGO_INITDB_DATABASE}
+    volumes:
+      - mongodata:/data/db:rw
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    # environment:
+      # - MONGODB_SERVER=mongodb://mongodb:27017
+      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      # - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      # - MONGODB_USERNAME=${MONGODB_USERNAME}
+      # - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      # - MONGO_INITDB_ROOT_USERNAME=admin
+      # - MONGO_INITDB_ROOT_PASSWORD=root
+      # - MONGO_INITDB_DATABASE=test_database
+      # - MONGODB_USERNAME=symfony
+      # - MONGODB_PASSWORD=symfony
+
+volumes:
+  mongodata:
