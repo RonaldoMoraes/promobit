@@ -8,6 +8,7 @@
         "composer/package-versions-deprecated": "^1.11",
         "doctrine/doctrine-bundle": "^2.1",
         "doctrine/doctrine-migrations-bundle": "^3.0",
+        "doctrine/mongodb-odm-bundle": "^4.2",
         "doctrine/orm": "^2.7",
         "firebase/php-jwt": "^5.2",
         "nelmio/api-doc-bundle": "dev-master",
@@ -85,7 +86,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "5.1.*"
         }
     }

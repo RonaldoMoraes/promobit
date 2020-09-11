@@ -6,6 +6,11 @@
 parameters:
     jwt_secret: '%env(string:JWT_SECRET)%'
     # jwt_secret: SOME_SECRET
+    # mongodb_server: "mongodb://localhost:27017"
+    # mongodb_server: "mongodb://username:password@localhost:27017/test_database"
+    env(MONGODB_URL): "mongodb://symfony:symfony@localhost:27017/test_database"
+    # env(MONGODB_URL): ''
+    env(MONGODB_DB): 'test_database'
 
 services:
     # default configuration for services in *this* file
