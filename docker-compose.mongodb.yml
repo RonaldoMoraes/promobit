@@ -12,7 +12,10 @@ services:
     volumes:
       - mongodata:/data/db:rw
     ports:
-      - "27017:27017"
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpass
     env_file:
       - .env
     # environment:

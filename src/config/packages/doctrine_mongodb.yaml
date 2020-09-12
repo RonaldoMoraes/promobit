@@ -3,11 +3,13 @@ doctrine_mongodb:
     auto_generate_hydrator_classes: true
     connections:
         default:
-            server: '%env(MONGODB_URL)%'
+            # server: '%env(MONGODB_URL)%'
+            server: "%mongodb_server%"
             options:
-                username: '%env(MONGODB_USERNAME)%'
-                password: '%env(MONGODB_PASSWORD)%'
-                authSource: '%env(MONGO_INITDB_DATABASE)%'
+                # username: '%env(MONGODB_USERNAME)%'
+                # password: '%env(MONGODB_PASSWORD)%'
+                # authSource: '%env(MONGO_INITDB_DATABASE)%'
+    # default_database: test_database
     default_database: '%env(MONGODB_DB)%'
     document_managers:
         default:
