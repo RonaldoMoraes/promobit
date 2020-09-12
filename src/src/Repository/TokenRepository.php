@@ -26,7 +26,8 @@ class TokenRepository extends ServiceDocumentRepository
         $token = new Token();
         $token
             ->setUserId($data['userId'])
-            ->setToken($data['token'])
+            ->setEmail($data['email'])
+            ->setKey($data['key'])
             ->setCreatedAt()
         ;
 
@@ -39,16 +40,16 @@ class TokenRepository extends ServiceDocumentRepository
     /**
      * Stores token on database
      */
-    public function isLatest(string $tokenStr, int $userId){
+    public function findLatestByEmail(string $email){
         // $token = $this->find();
         $token = $this->dm->createQueryBuilder(Token::class)
-            ->field('userId')->equals($userId)
+            ->field('email')->equals($email)
             ->sort('createdAt', 'DESC')
             ->limit(1)
             ->getQuery()
             ->getSingleResult()
         ;
-        // dd($token->getToken(), $tokenStr);
-        return $token->getToken() === $tokenStr;
+
+        return $token;
     }
 }

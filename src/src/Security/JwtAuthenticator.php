@@ -14,19 +14,33 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use \Firebase\JWT\JWT;
 use App\Entity\User;
+use App\Document\Token;
 use App\Repository\TokenRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $params;
-    private $tokenRepository;
+    private $dm;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, TokenRepository $tokenRepository)
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm)
     {
         $this->em = $em;
+        $this->dm = $dm;
         $this->params = $params;
-        $this->tokenRepository = $tokenRepository;
+    }
+
+    private function getEmailFromJwt(string &$credentials)
+    {
+        $credentials = str_replace('Bearer ', '', $credentials);
+        $jwt = (array) JWT::decode(
+            $credentials, 
+            $this->params->get('jwt_secret'),
+            ['HS256']
+        );
+        
+        return $jwt['user'];
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
@@ -51,15 +65,10 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $credentials = str_replace('Bearer ', '', $credentials);
-            $jwt = (array) JWT::decode(
-                $credentials, 
-                $this->params->get('jwt_secret'),
-                ['HS256']
-            );
-            return $this->em->getRepository(User::class)
-                ->findOneBy([
-                    'email' => $jwt['user'],
-                ]);
+            $email = $this->getEmailFromJwt($credentials);
+            $user = $this->em->getRepository(User::class)->findByEmail($email);
+
+            return $user;
         }catch (\Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
         }
@@ -69,16 +78,11 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $credentials = str_replace('Bearer ', '', $credentials);
-            $jwt = (array) JWT::decode(
-                $credentials, 
-                $this->params->get('jwt_secret'),
-                ['HS256']
-            );
-            $user = $this->em->getRepository(User::class)->findByEmail($jwt['user']);
-            $validToken = $this->tokenRepository->isLatest($credentials, $user->getId());
-            
-            return $validToken;
-        } catch (\Throwable $th) {
+            $email = $this->getEmailFromJwt($credentials);
+            $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
+
+            return $credentials === $token->getKey();
+        } catch (\Exception $exception) {
             return false;
         }
     }

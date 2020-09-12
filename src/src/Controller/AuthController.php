@@ -33,7 +33,8 @@ class AuthController extends AbstractController
             $jwt = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
             $tokenRepository->store([
                 'userId' => $user->getId(),
-                'token' => $jwt
+                'email' => $user->getEmail(),
+                'key' => $jwt
             ]);
 
             return new JsonResponse(['data' => ['token' => $jwt]], Response::HTTP_OK);

@@ -26,7 +26,12 @@ class Token
     /**
      * @MongoDB\Field(type="string")
      */
-    protected $token;
+    protected $email;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $key;
 
     /**
      * @MongoDB\Field(type="date")
@@ -49,14 +54,25 @@ class Token
         return $this;
     }
 
-    public function getToken()
+    public function getEmail()
     {
-        return $this->token;
+        return $this->email;
     }
 
-    public function setToken(string $token)
+    public function setEmail(string $email)
     {
-        $this->token = $token;
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    public function setKey(string $key)
+    {
+        $this->key = $key;
         return $this;
     }
 
@@ -69,6 +85,17 @@ class Token
     {
         $this->createdAt = new \DateTime();
         return $this;
+    }
+
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'userId' => $this->getUserId(),
+            'email' => $this->getEmail(),
+            'key' => $this->getKey(),
+            'createdAt' => $this->getCreatedAt(),
+        );
     }
 
 }
