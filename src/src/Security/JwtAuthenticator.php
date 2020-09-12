@@ -14,16 +14,19 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use \Firebase\JWT\JWT;
 use App\Entity\User;
+use App\Repository\TokenRepository;
 
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $params;
+    private $tokenRepository;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params)
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, TokenRepository $tokenRepository)
     {
         $this->em = $em;
         $this->params = $params;
+        $this->tokenRepository = $tokenRepository;
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
@@ -64,7 +67,20 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return true;
+        try {
+            $credentials = str_replace('Bearer ', '', $credentials);
+            $jwt = (array) JWT::decode(
+                $credentials, 
+                $this->params->get('jwt_secret'),
+                ['HS256']
+            );
+            $user = $this->em->getRepository(User::class)->findByEmail($jwt['user']);
+            $validToken = $this->tokenRepository->isLatest($credentials, $user->getId());
+            
+            return $validToken;
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
