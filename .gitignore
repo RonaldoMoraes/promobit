@@ -1,7 +1,7 @@
 database/data
 logs
 .whatever
-
+mongodb/.data
 ###> symfony/phpunit-bridge ###
 src/.phpunit
 src/.phpunit.result.cache
