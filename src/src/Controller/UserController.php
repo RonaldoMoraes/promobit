@@ -52,6 +52,7 @@ class UserController extends AbstractController
             }
 
             $user = $this->userRepository->store($data)->toArray();
+            $this->sessionUtil->set("userId-" . $user['id'], $user);
 
             return new JsonResponse(['data' => $user], Response::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -65,10 +66,17 @@ class UserController extends AbstractController
     public function show(int $id): JsonResponse
     {
         try {
+
+            $sessionUser = $this->sessionUtil->get("userId-" . $id);
+            if (!!$sessionUser)
+            {
+                return new JsonResponse(['data' => $sessionUser], Response::HTTP_OK);
+            }
             if(!$user = $this->userRepository->show($id)->toArray())
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
+            $this->sessionUtil->set("userId-" . $id, $user);
 
             return new JsonResponse(['data' => $user], Response::HTTP_OK);
         } catch (\Exception $e) {
