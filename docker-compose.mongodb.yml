@@ -18,18 +18,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=adminpass
     env_file:
       - .env
-    # environment:
-      # - MONGODB_SERVER=mongodb://mongodb:27017
-      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      # - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-      # - MONGODB_USERNAME=${MONGODB_USERNAME}
-      # - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      # - MONGO_INITDB_ROOT_USERNAME=admin
-      # - MONGO_INITDB_ROOT_PASSWORD=root
-      # - MONGO_INITDB_DATABASE=test_database
-      # - MONGODB_USERNAME=symfony
-      # - MONGODB_PASSWORD=symfony
 
 volumes:
   mongodata:

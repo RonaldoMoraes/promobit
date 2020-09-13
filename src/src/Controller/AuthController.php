@@ -10,10 +10,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Repository\UserRepository;
 use App\Repository\TokenRepository;
+use App\Util\SessionUtil;
 use \Firebase\JWT\JWT;
 
 class AuthController extends AbstractController
 {
+    private $sessionUtil;
+
+    public function __construct(SessionUtil $sessionUtil)
+    {   
+        $this->sessionUtil = $sessionUtil;
+    }
+
     /**
      * @Route("/api/login", name="login", methods={"POST"})
      */
@@ -36,6 +44,8 @@ class AuthController extends AbstractController
                 'email' => $user->getEmail(),
                 'key' => $jwt
             ]);
+            // Store no redis
+            $this->sessionUtil->set($data['email'], $jwt);
 
             return new JsonResponse(['data' => ['token' => $jwt]], Response::HTTP_OK);
         } catch (\Exception $e) {

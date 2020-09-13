@@ -6,18 +6,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\UserRepository;
 use App\Entity\User;
+use App\Util\SessionUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 // use OpenApi\Annotations as SWG;
 
 class UserController extends AbstractController
 {
     private $userRepository;
+    private $sessionUtil;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, SessionUtil $sessionUtil)
     {
         $this->userRepository = $userRepository;
+        $this->sessionUtil = $sessionUtil;
     }
 
     /**
@@ -47,9 +51,10 @@ class UserController extends AbstractController
                 return new JsonResponse(['message' => 'Expecting mandatory parameters'], Response::HTTP_BAD_REQUEST);
             }
 
-            $user = $this->userRepository->store($data);
+            $user = $this->userRepository->store($data)->toArray();
+            $this->sessionUtil->set("userId-" . $user['id'], $user);
 
-            return new JsonResponse(['data' => $user->toArray()], Response::HTTP_CREATED);
+            return new JsonResponse(['data' => $user], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be created due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -61,12 +66,19 @@ class UserController extends AbstractController
     public function show(int $id): JsonResponse
     {
         try {
-            if(!$user = $this->userRepository->show($id))
+
+            $sessionUser = $this->sessionUtil->get("userId-" . $id);
+            if (!!$sessionUser)
+            {
+                return new JsonResponse(['data' => $sessionUser], Response::HTTP_OK);
+            }
+            if(!$user = $this->userRepository->show($id)->toArray())
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
+            $this->sessionUtil->set("userId-" . $id, $user);
 
-            return new JsonResponse(['data' => $user->toArray()], Response::HTTP_OK);
+            return new JsonResponse(['data' => $user], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -16,19 +16,23 @@ use \Firebase\JWT\JWT;
 use App\Entity\User;
 use App\Document\Token;
 use App\Repository\TokenRepository;
+use App\Util\SessionUtil;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $params;
     private $dm;
+    private $sessionUtil;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm)
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm, SessionUtil $sessionUtil)
     {
         $this->em = $em;
         $this->dm = $dm;
         $this->params = $params;
+        $this->sessionUtil = $sessionUtil;
     }
 
     private function getEmailFromJwt(string &$credentials)
@@ -74,14 +78,28 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
         }
     }
 
+    // Comment Try/Catch and Uncomment microtime parts for debugging how many time we save using Redis Cache for login
     public function checkCredentials($credentials, UserInterface $user)
     {
         try {
+            // $start = microtime(true);
             $credentials = str_replace('Bearer ', '', $credentials);
             $email = $this->getEmailFromJwt($credentials);
-            $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
+            $matchSessionCredentials = $this->sessionUtil->compareValue($email, $credentials);
+            if(!!$matchSessionCredentials)
+            {
+                // $time_elapsed_secs1 = (microtime(true) - $start) * 1000;
+                // dd('ALREADY CACHED', "$time_elapsed_secs1 ms");
+                return true;
+            }
 
-            return $credentials === $token->getKey();
+            $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
+            $matchCredentials = $credentials === $token->getKey() && $this->sessionUtil->set($email, $credentials);
+
+            // $time_elapsed_secs2 = (microtime(true) - $start) * 1000;
+            // dd('NOT CACHED YET', "$time_elapsed_secs2 ms");
+
+            return $matchCredentials;
         } catch (\Exception $exception) {
             return false;
         }
