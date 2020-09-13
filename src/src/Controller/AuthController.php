@@ -10,23 +10,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Repository\UserRepository;
 use App\Repository\TokenRepository;
+use App\Util\SessionUtil;
 use \Firebase\JWT\JWT;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AuthController extends AbstractController
 {
-    private $session;
+    private $sessionUtil;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(SessionUtil $sessionUtil)
     {   
-        $this->session = $session;
-    }
-
-    private function setSession(string $key, $val)
-    {
-        try {
-            $this->session->set($key, $val);
-        } catch (\Exception $e) {}
+        $this->sessionUtil = $sessionUtil;
     }
 
     /**
@@ -36,9 +29,6 @@ class AuthController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-            
-            // if($token = $this->session->get($data['email'])['tokenKey'])
-            
             $user = $userRepository->findByEmail($data['email']);            
             if (!$user || !$encoder->isPasswordValid($user, $data['password'])) {
                 return new JsonResponse(['message' => 'Email or password is wrong.'], Response::HTTP_BAD_REQUEST);
@@ -55,7 +45,7 @@ class AuthController extends AbstractController
                 'key' => $jwt
             ]);
             // Store no redis
-            $this->setSession($data['email'], array_merge($user->toArray(), ['tokenKey' => $jwt]));
+            $this->sessionUtil->set($data['email'], $jwt);
 
             return new JsonResponse(['data' => ['token' => $jwt]], Response::HTTP_OK);
         } catch (\Exception $e) {

@@ -6,29 +6,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\UserRepository;
 use App\Entity\User;
+use App\Util\SessionUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 // use OpenApi\Annotations as SWG;
 
 class UserController extends AbstractController
 {
     private $userRepository;
-    private $session;
+    private $sessionUtil;
 
-    public function __construct(UserRepository $userRepository, SessionInterface $session)
+    public function __construct(UserRepository $userRepository, SessionUtil $sessionUtil)
     {
         $this->userRepository = $userRepository;
-        $this->session = $session;
-    }
-
-    private function setSession(string $key, $val)
-    {
-        try {
-            $this->session->set($key, $val);
-        } catch (\Exception $e) {}
+        $this->sessionUtil = $sessionUtil;
     }
 
     /**

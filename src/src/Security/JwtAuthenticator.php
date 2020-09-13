@@ -16,6 +16,7 @@ use \Firebase\JWT\JWT;
 use App\Entity\User;
 use App\Document\Token;
 use App\Repository\TokenRepository;
+use App\Util\SessionUtil;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -24,14 +25,14 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
     private $em;
     private $params;
     private $dm;
-    private $session;
+    private $sessionUtil;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm, SessionInterface $session)
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm, SessionUtil $sessionUtil)
     {
         $this->em = $em;
         $this->dm = $dm;
         $this->params = $params;
-        $this->session = $session;
+        $this->sessionUtil = $sessionUtil;
     }
 
     private function getEmailFromJwt(string &$credentials)
@@ -77,23 +78,31 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
         }
     }
 
+    // Comment Try/Catch and Uncomment microtime parts for debugging how many time we save using Redis Cache for login
     public function checkCredentials($credentials, UserInterface $user)
     {
-        // try {
+        try {
+            // $start = microtime(true);
             $credentials = str_replace('Bearer ', '', $credentials);
             $email = $this->getEmailFromJwt($credentials);
-            $sessionUser = $this->session->get($email);
-            if(!!$sessionUser && isset($sessionUser['tokenKey']) && $sessionUser['tokenKey'] === $credentials)
+            $matchSessionCredentials = $this->sessionUtil->compareValue($email, $credentials);
+            if(!!$matchSessionCredentials)
             {
+                // $time_elapsed_secs1 = (microtime(true) - $start) * 1000;
+                // dd('ALREADY CACHED', "$time_elapsed_secs1 ms");
                 return true;
             }
 
             $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
+            $matchCredentials = $credentials === $token->getKey() && $this->sessionUtil->set($email, $credentials);
 
-            return $credentials === $token->getKey();
-        // } catch (\Exception $exception) {
-        //     return false;
-        // }
+            // $time_elapsed_secs2 = (microtime(true) - $start) * 1000;
+            // dd('NOT CACHED YET', "$time_elapsed_secs2 ms");
+
+            return $matchCredentials;
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

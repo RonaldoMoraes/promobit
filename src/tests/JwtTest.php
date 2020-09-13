@@ -17,6 +17,8 @@ class JwtTest extends KernelTestCase
      */
     private $dm;
     private $tokenRepository;
+    private $sessionUtil;
+    // private $jwtAuthenticator;
     private $tokenMock;
 
     protected function setUp(): void
@@ -28,6 +30,8 @@ class JwtTest extends KernelTestCase
             ->getManager();
         
         $this->tokenRepository = $this->dm->getRepository(Token::class);
+        $this->sessionUtil = self::$container->get('App\Util\SessionUtil');
+        // $this->jwtAuthenticator = self::$container->get('App\Security\JwtAuthenticator');
         $this->tokenMock = array(
             'userId'    => 2,
             'email'     => 'ronaldo@mail.com',
@@ -68,6 +72,14 @@ class JwtTest extends KernelTestCase
         $this->assertEquals($this->tokenMock, $token->toArray());
     }
 
+    public function testSessionWorks()
+    {
+        $this->sessionUtil->set('ronaldo', 'rei da pelada');
+        $ronaldo = $this->sessionUtil->get('ronaldo');
+        // dd($ronaldo);
+        $this->assertEquals('rei da pelada', $ronaldo);
+        $this->assertNotEquals('pipoqueiro', $ronaldo);
+    }
     // assert Unauthorized
     // assert no header
     // assert jwt malformed
