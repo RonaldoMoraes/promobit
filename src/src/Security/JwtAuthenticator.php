@@ -17,18 +17,21 @@ use App\Entity\User;
 use App\Document\Token;
 use App\Repository\TokenRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class JwtAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
     private $params;
     private $dm;
+    private $session;
 
-    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm)
+    public function __construct(EntityManagerInterface $em, ContainerBagInterface $params, DocumentManager $dm, SessionInterface $session)
     {
         $this->em = $em;
         $this->dm = $dm;
         $this->params = $params;
+        $this->session = $session;
     }
 
     private function getEmailFromJwt(string &$credentials)
@@ -76,15 +79,21 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        try {
+        // try {
             $credentials = str_replace('Bearer ', '', $credentials);
             $email = $this->getEmailFromJwt($credentials);
+            $sessionUser = $this->session->get($email);
+            if(!!$sessionUser && isset($sessionUser['tokenKey']) && $sessionUser['tokenKey'] === $credentials)
+            {
+                return true;
+            }
+
             $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
 
             return $credentials === $token->getKey();
-        } catch (\Exception $exception) {
-            return false;
-        }
+        // } catch (\Exception $exception) {
+        //     return false;
+        // }
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

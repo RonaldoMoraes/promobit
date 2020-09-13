@@ -9,15 +9,26 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 // use OpenApi\Annotations as SWG;
 
 class UserController extends AbstractController
 {
     private $userRepository;
+    private $session;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, SessionInterface $session)
     {
         $this->userRepository = $userRepository;
+        $this->session = $session;
+    }
+
+    private function setSession(string $key, $val)
+    {
+        try {
+            $this->session->set($key, $val);
+        } catch (\Exception $e) {}
     }
 
     /**
@@ -47,9 +58,9 @@ class UserController extends AbstractController
                 return new JsonResponse(['message' => 'Expecting mandatory parameters'], Response::HTTP_BAD_REQUEST);
             }
 
-            $user = $this->userRepository->store($data);
+            $user = $this->userRepository->store($data)->toArray();
 
-            return new JsonResponse(['data' => $user->toArray()], Response::HTTP_CREATED);
+            return new JsonResponse(['data' => $user], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be created due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -61,12 +72,12 @@ class UserController extends AbstractController
     public function show(int $id): JsonResponse
     {
         try {
-            if(!$user = $this->userRepository->show($id))
+            if(!$user = $this->userRepository->show($id)->toArray())
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
 
-            return new JsonResponse(['data' => $user->toArray()], Response::HTTP_OK);
+            return new JsonResponse(['data' => $user], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
