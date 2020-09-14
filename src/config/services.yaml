@@ -28,6 +28,7 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            # - '../src/Document/'
             - '../src/Kernel.php'
             - '../src/Tests/'
 

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
+use App\Message\SendRecoveryEmailMessage;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,6 +19,7 @@ use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @Route("/reset-password")
@@ -27,10 +29,12 @@ class ResetPasswordController extends AbstractController
     use ResetPasswordControllerTrait;
 
     private $resetPasswordHelper;
+    private $messageBus;
 
-    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper)
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, MessageBusInterface $messageBus)
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
+        $this->messageBus = $messageBus;
     }
 
     /**
@@ -140,7 +144,7 @@ class ResetPasswordController extends AbstractController
         return new JsonResponse(['message' => 'You were hacked, give me the job and I give your data back. Kidding kkk'], Response::HTTP_OK);
     }
 
-    private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer): RedirectResponse
+    private function processSendingPasswordResetEmail(string $emailFormData/* , MailerInterface $mailer */): RedirectResponse
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
@@ -169,18 +173,8 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_check_email');
         }
 
-        $email = (new TemplatedEmail())
-            ->from(new Address('ronaldo.moraes1990@gmail.com', 'Acme Mail Bot'))
-            ->to($user->getEmail())
-            ->subject('Your password reset request')
-            ->htmlTemplate('reset_password/email.html.twig')
-            ->context([
-                'resetToken' => $resetToken,
-                'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
-            ])
-        ;
-
-        $mailer->send($email);
+        $sendEmailMessage = new SendRecoveryEmailMessage($user->getEmail(), $resetToken, $this->resetPasswordHelper->getTokenLifetime());
+        $this->messageBus->dispatch($sendEmailMessage);
 
         return $this->redirectToRoute('app_check_email');
     }
