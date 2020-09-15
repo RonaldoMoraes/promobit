@@ -6,7 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\UserRepository;
 use App\Entity\User;
-use App\Util\SessionUtil;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,12 +17,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class UserController extends AbstractController
 {
     private $userRepository;
-    private $sessionUtil;
+    private $cache;
 
-    public function __construct(UserRepository $userRepository, SessionUtil $sessionUtil)
+    public function __construct(UserRepository $userRepository, CacheInterface $cache)
     {
         $this->userRepository = $userRepository;
-        $this->sessionUtil = $sessionUtil;
+        $this->cache = $cache;
     }
 
     /**
@@ -52,7 +53,10 @@ class UserController extends AbstractController
             }
 
             $user = $this->userRepository->store($data)->toArray();
-            $this->sessionUtil->set("userId-" . $user['id'], $user);
+
+            $this->cache->get("userId-" . $user['id'], function(ItemInterface $item) use ($user){
+                return $user;
+            });
 
             return new JsonResponse(['data' => $user], Response::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -67,16 +71,15 @@ class UserController extends AbstractController
     {
         try {
 
-            $sessionUser = $this->sessionUtil->get("userId-" . $id);
-            if (!!$sessionUser)
+            $user = $this->cache->get("userId-" . $id, function(ItemInterface $item) use ($id)
             {
-                return new JsonResponse(['data' => $sessionUser], Response::HTTP_OK);
-            }
-            if(!$user = $this->userRepository->show($id)->toArray())
+                return $this->userRepository->show($id)->toArray();
+            });
+
+            if(!$user)
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
-            $this->sessionUtil->set("userId-" . $id, $user);
 
             return new JsonResponse(['data' => $user], Response::HTTP_OK);
         } catch (\Exception $e) {
@@ -99,6 +102,11 @@ class UserController extends AbstractController
             }
             $this->userRepository->update($user, $data);
 
+            $this->cache->delete("userId-" . $id);
+            $this->cache->get("userId-" . $id, function(ItemInterface $item) use ($user){
+                return $user->toArray();
+            });
+
             return new JsonResponse(['data' => []], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be updated due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -115,6 +123,7 @@ class UserController extends AbstractController
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
+            $this->cache->delete("userId-" . $id);
             $this->userRepository->delete($user);
 
             return new JsonResponse(['data' => []], Response::HTTP_OK);

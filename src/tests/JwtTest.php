@@ -8,6 +8,11 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Doctrine\DBAL\UniqueConstraintViolationException;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\Request;
+// use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class JwtTest extends KernelTestCase
 {
@@ -17,7 +22,7 @@ class JwtTest extends KernelTestCase
      */
     private $dm;
     private $tokenRepository;
-    private $sessionUtil;
+    private $cache;
     // private $jwtAuthenticator;
     private $tokenMock;
 
@@ -30,7 +35,8 @@ class JwtTest extends KernelTestCase
             ->getManager();
         
         $this->tokenRepository = $this->dm->getRepository(Token::class);
-        $this->sessionUtil = self::$container->get('App\Util\SessionUtil');
+        $this->cache = self::$container->get('Symfony\Contracts\Cache\CacheInterface');
+        $this->jwtAuthenticator = self::$container->get('App\Security\JwtAuthenticator');
         // $this->jwtAuthenticator = self::$container->get('App\Security\JwtAuthenticator');
         $this->tokenMock = array(
             'userId'    => 2,
@@ -42,45 +48,83 @@ class JwtTest extends KernelTestCase
     private function store(?array $token = null)
     {
         $data = $token ?? $this->tokenMock;
-
         $newToken = $this->tokenRepository->store($data);
 
         return $newToken;
     }
 
-    // [ INTEGRATION TEST ]
-    public function testUStore()
+    public function testUJwtStart()
     {
-        $token = $this->store();
+        $response = $this->jwtAuthenticator->start(new Request);
+        $content = $response->getContent();
+        $statusCode = $response->getStatusCode();
 
-        $this->assertInstanceOf(Token::class, $token);
-        $this->assertSame($token->getEmail(), $this->tokenMock['email']);
+        $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
+        $this->assertEquals(401, $statusCode);
     }
-    
-    // [ INTEGRATION TEST ]
-    public function testIStore()
+
+    public function testUJwtSupports()
     {
-        $token = $this->store();       
-
-        $tokenFound = $this->tokenRepository->findLatestByEmail('ronaldo@mail.com');
-
-        $this->assertSame($token, $tokenFound);
+        // $response = $this->jwtAuthenticator->supports($request);
+        // $content = $response->getContent();
+        // $statusCode = $response->getStatusCode();
         
-        $this->tokenMock['id'] = $tokenFound->getId();
-        $this->tokenMock['createdAt'] = $tokenFound->getCreatedAt();
-        // dd($this->tokenMock, $token->toArray());
-        $this->assertEquals($this->tokenMock, $token->toArray());
+        // $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
+        // $this->assertEquals(401, $statusCode);
+        $this->assertTrue(true);
     }
 
-    public function testSessionWorks()
+    public function testUJwtGetCredentials()
     {
-        $this->sessionUtil->set('ronaldo', 'rei da pelada');
-        $ronaldo = $this->sessionUtil->get('ronaldo');
-        // dd($ronaldo);
-        $this->assertEquals('rei da pelada', $ronaldo);
-        $this->assertNotEquals('pipoqueiro', $ronaldo);
+        // $response = $this->jwtAuthenticator->supports($request);
+        // $content = $response->getContent();
+        // $statusCode = $response->getStatusCode();
+        
+        // $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
+        // $this->assertEquals(401, $statusCode);
+        $this->assertTrue(true);
     }
+
+    public function testUJwtGetUser()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testUJwtCheckCredentials()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testUJwtOnAuthenticationFailure()
+    {
+        $response = $this->jwtAuthenticator->onAuthenticationFailure(new Request, new AuthenticationException);
+        $content = $response->getContent();
+        $statusCode = $response->getStatusCode();
+        // dd(json_decode($content, 1));
+        $this->assertEquals('Unauthorized access.', json_decode($content, 1)['message']);
+        $this->assertEquals(401, $statusCode);
+    }
+
+    public function testUJwtOnAuthenticationSuccess()
+    {
+        // $response = $this->jwtAuthenticator->onAuthenticationSuccess(new Request, new TokenInterface, '');
+        // dd($response);
+        $this->assertFalse(false);
+    }
+
+    public function testUJwtSupportsRememberMe()
+    {
+        $response = $this->jwtAuthenticator->supportsRememberMe();
+        $this->assertFalse($response);
+    }
+
+    
     // assert Unauthorized
     // assert no header
     // assert jwt malformed
 }
+
+// fazer request sem authorization -> assert 401
+// fazer request com token errado -> assert 401?
+// fazer request com senha errada -> assert 401
+// fazer request com senha correta -> assert 200
