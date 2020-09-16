@@ -10,3 +10,5 @@ src/bin/.phpunit
 ###< symfony/phpunit-bridge ###
 
 src/TESTE
+.env*
+!.env-example
