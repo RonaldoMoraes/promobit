@@ -47,3 +47,14 @@ ENV DATABASE_URL=none
 RUN set -x \
     # App libs
     && composer install
+
+ENV PORT=80
+
+WORKDIR /app/public
+
+RUN set -x \
+    && echo '#!/bin/bash' > /entrypoint.sh \
+    && echo 'php -S 0.0.0.0:$PORT' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+CMD /entrypoint.sh
