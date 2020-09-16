@@ -37,7 +37,7 @@ class AuthController extends AbstractController
 
             $jwtSecret = $this->getParameter('jwt_secret');
             $cache->delete(urlencode($data['email']));
-            $jwtCached = $cache->get(urlencode($data['email']), function (ItemInterface $item) use($jwtSecret, $user, $tokenRepository){            
+            $jwtCached = $cache->get(urlencode($data['email']), function () use($jwtSecret, $user, $tokenRepository){            
                 $payload = [
                     "user" => $user->getUsername(),
                     "exp"  => (new \DateTime())->modify("+90 minutes")->getTimestamp(),

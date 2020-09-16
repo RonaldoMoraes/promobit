@@ -56,7 +56,7 @@ class UserController extends AbstractController
 
             $user = $this->userRepository->store($data)->toArray();
 
-            $this->cache->get("userId-" . $user['id'], function(ItemInterface $item) use ($user){
+            $this->cache->get("userId-" . $user['id'], function() use ($user){
                 return $user;
             });
 
@@ -73,7 +73,7 @@ class UserController extends AbstractController
     {
         try {
 
-            $user = $this->cache->get("userId-" . $id, function(ItemInterface $item) use ($id)
+            $user = $this->cache->get("userId-" . $id, function() use ($id)
             {
                 $user = $this->userRepository->show($id);
                 return $user ? $user->toArray() : [];
@@ -108,7 +108,7 @@ class UserController extends AbstractController
             $this->userRepository->update($user, $data);
 
             $this->cache->delete("userId-" . $id);
-            $this->cache->get("userId-" . $id, function(ItemInterface $item) use ($user){
+            $this->cache->get("userId-" . $id, function() use ($user){
                 return $user->toArray();
             });
 

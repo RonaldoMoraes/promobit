@@ -85,7 +85,7 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
             $credentials = str_replace('Bearer ', '', $credentials);
             $email = $this->getEmailFromJwt($credentials);
             
-            $jwtCached = $this->cache->get(urlencode($email), function (ItemInterface $item) use($email, $credentials){            
+            $jwtCached = $this->cache->get(urlencode($email), function () use($email, $credentials){            
                 $token = $this->dm->getRepository(Token::class)->findLatestByEmail($email);
                 $jwt = $credentials === $token->getKey() ? $credentials : null;
 
