@@ -38,15 +38,16 @@ class LoginFunctionalTest extends WebTestCase
         $client->request(...$request);
     }
 
-    private function loginUser($client)
+    private function loginUser($client, array $user = [])
     {
+        $user = !empty($user) ? $user : $this->userMock;
         $request = array(
             'POST',
             '/api/login',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode(array('email' => $this->userMock['email'], 'password' => $this->userMock['password']))
+            json_encode(array('email' => $user['email'], 'password' => $user['password']))
         );        
 
         $client->request(...$request);
@@ -57,15 +58,23 @@ class LoginFunctionalTest extends WebTestCase
     {
         $clientFirst = static::createClient();
         $clientSecond = clone($clientFirst);
+        $clientThird = clone($clientFirst);
 
         $this->registerUser($clientFirst);
         $this->loginUser($clientSecond);
-
+        
         $response = $clientSecond->getResponse();
         $responseData = json_decode($response->getContent(), true);
-
+        
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertArrayHasKey('token', $responseData['data']);
+        
+        $this->loginUser($clientThird, [
+            'email' => 'anonymous@mail.com',
+            'password' => '123321'
+        ]);
+        $response = $clientThird->getResponse();
+        $this->assertEquals(400, $response->getStatusCode());
     }
 
 }

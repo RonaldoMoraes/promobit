@@ -53,6 +53,14 @@ class JwtTest extends KernelTestCase
         return $newToken;
     }
 
+    public function testFindLastest()
+    {
+        $this->store();
+        $email = $this->tokenMock['email'];
+        $token = $this->tokenRepository->findLatestByEmail($email)->toArray();
+        $this->assertEquals($this->tokenMock['key'], $token['key']);
+    }
+
     public function testUJwtStart()
     {
         $response = $this->jwtAuthenticator->start(new Request);
@@ -61,28 +69,6 @@ class JwtTest extends KernelTestCase
 
         $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
         $this->assertEquals(401, $statusCode);
-    }
-
-    public function testUJwtSupports()
-    {
-        // $response = $this->jwtAuthenticator->supports($request);
-        // $content = $response->getContent();
-        // $statusCode = $response->getStatusCode();
-        
-        // $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
-        // $this->assertEquals(401, $statusCode);
-        $this->assertTrue(true);
-    }
-
-    public function testUJwtGetCredentials()
-    {
-        // $response = $this->jwtAuthenticator->supports($request);
-        // $content = $response->getContent();
-        // $statusCode = $response->getStatusCode();
-        
-        // $this->assertEquals('Authentication Required', json_decode($content, 1)['message']);
-        // $this->assertEquals(401, $statusCode);
-        $this->assertTrue(true);
     }
 
     public function testUJwtGetUser()
