@@ -46,15 +46,18 @@ ENV DATABASE_URL=none
 
 RUN set -x \
     # App libs
-    && composer install
+    && composer install --no-scripts
 
 ENV PORT=80
 
-WORKDIR /app/public
+WORKDIR /app
 
 RUN set -x \
+    && echo '' > /app/.env \
     && echo '#!/bin/bash' > /entrypoint.sh \
-    && echo 'php -S 0.0.0.0:$PORT' > /entrypoint.sh \
+    && echo 'composer install' >> /entrypoint.sh \
+    && echo 'cd public/' >> /entrypoint.sh \
+    && echo 'php -S 0.0.0.0:$PORT' >> /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
 CMD /entrypoint.sh
