@@ -72,9 +72,11 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
             $user = $this->em->getRepository(User::class)->findByEmail($email);
 
             return $user;
+            // @codeCoverageIgnoreStart
         }catch (\Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
         }
+        // @codeCoverageIgnoreEnd
     }
 
     public function checkCredentials($credentials, UserInterface $user)
@@ -91,9 +93,11 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
             });
 
             return !!$jwtCached;
+            // @codeCoverageIgnoreStart
         } catch (\Exception $exception) {
             return false;
         }
+        // @codeCoverageIgnoreEnd
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

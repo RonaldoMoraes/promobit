@@ -6,6 +6,17 @@ use PHPUnit\Framework\TestCase;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Doctrine\DBAL\UniqueConstraintViolationException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+class FakeUser implements UserInterface
+{
+    public function getRoles(){}
+    public function getPassword(){}
+    public function getSalt(){}
+    public function getUsername(){}
+    public function eraseCredentials(){}
+}
 
 class UserTest extends KernelTestCase
 {
@@ -41,6 +52,56 @@ class UserTest extends KernelTestCase
         $newUser = $this->userRepository->store($data);
 
         return $newUser;
+    }
+
+    public function testSetRoles()
+    {
+        $user = $this->store();
+        // $user = $this->userRepository->show($user['id']);
+        $roles = $user->setRoles(['TEST']);
+        // dd($roles->getRoles());
+        $this->assertEquals(['TEST', 'ROLE_USER'], $roles->getRoles());
+    }
+
+    // public function testGetRoles()
+    // {
+    //     $user = $this->store();
+    //  //   $user = $this->userRepository->show($user['id']);
+    //     $roles = $user->getRoles();
+
+    //     $this->assertEquals(['ROLE_USER'], $roles);
+    // }
+
+    public function testUpgradePassword()
+    {
+        $user = $this->store();
+        // $user = $this->userRepository->listAll()[0];
+        // $user = $this->userRepository->show($user['id']);
+
+        $condition = $this->userRepository->upgradePassword($user, '123123');
+        $this->assertFalse(!!$condition);
+
+        $fake = new FakeUser();
+        $this->expectException(UnsupportedUserException::class);
+        $this->userRepository->upgradePassword($fake, '123123');
+    }
+    
+    public function testShow()
+    {
+        $userFirst = $this->store();
+        // $users = $this->userRepository->listAll();
+        $user = $this->userRepository->show($userFirst->getId())->toArray();
+        // dd($users);
+        $this->assertEquals($userFirst->getEmail(), $user['email']);
+    }
+    
+    public function testListAll()
+    {
+        $this->store();
+        $user = $this->userMock;
+        $users = $this->userRepository->listAll();
+        // dd($users);
+        $this->assertEquals($user['email'], $users[0]['email']);
     }
 
     // [ INTEGRATION TEST ]

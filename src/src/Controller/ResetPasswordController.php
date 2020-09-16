@@ -23,6 +23,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @Route("/reset-password")
+ * @codeCoverageIgnore
  */
 class ResetPasswordController extends AbstractController
 {

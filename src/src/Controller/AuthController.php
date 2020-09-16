@@ -53,8 +53,10 @@ class AuthController extends AbstractController
             });
 
             return new JsonResponse(['data' => ['token' => $jwtCached]], Response::HTTP_OK);
+        // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'Could not login that user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        // @codeCoverageIgnoreEnd
     }
 }

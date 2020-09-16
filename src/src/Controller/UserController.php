@@ -34,9 +34,11 @@ class UserController extends AbstractController
             $users = $this->userRepository->listAll();
 
             return new JsonResponse(['data' => $users], Response::HTTP_OK);
+        // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'Users could not be listed due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -73,18 +75,21 @@ class UserController extends AbstractController
 
             $user = $this->cache->get("userId-" . $id, function(ItemInterface $item) use ($id)
             {
-                return $this->userRepository->show($id)->toArray();
+                $user = $this->userRepository->show($id);
+                return $user ? $user->toArray() : [];
             });
 
-            if(!$user)
+            if(empty($user))
             {
                 return new JsonResponse(['message' => 'User not found.'], Response::HTTP_BAD_REQUEST);
             }
 
+            // @codeCoverageIgnoreStart
             return new JsonResponse(['data' => $user], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be found due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -107,10 +112,12 @@ class UserController extends AbstractController
                 return $user->toArray();
             });
 
+            // @codeCoverageIgnoreStart
             return new JsonResponse(['data' => []], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be updated due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -126,9 +133,11 @@ class UserController extends AbstractController
             $this->cache->delete("userId-" . $id);
             $this->userRepository->delete($user);
 
+            // @codeCoverageIgnoreStart
             return new JsonResponse(['data' => []], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['message' => 'User could not be deleted due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        // @codeCoverageIgnoreEnd
     }
 }
