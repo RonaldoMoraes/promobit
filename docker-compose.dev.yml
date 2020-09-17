@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  database:
+    container_name: promobit_mysql
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=promobit_ronaldo_dev
+      - MYSQL_USER=promobit_mysql
+      - MYSQL_PASSWORD=promobit_mysql
+      - MYSQL_ROOT_PASSWORD=promobit_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - database-data:/var/lib/mysql
+
+  mongodb:
+    container_name: promobit_mongodb
+    build:
+      context: ./mongodb
+      dockerfile: Dockerfile
+      args:
+        - mongodb_username=ronaldo_promobit
+        - mongodb_password=ronaldo_promobit
+        - mongodb_initdb_database=promobit_ronaldo_dev_nosql
+    volumes:
+      - mongo-data:/data/db:rw
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=ronaldo_promobit
+      - MONGO_INITDB_ROOT_PASSWORD=ronaldo_promobit
+    env_file:
+      - .env
+
+  rabbitmq:
+    container_name: promobit_rabbitmq
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_DEFAULT_USER: followthewhiterabbitneo
+      RABBITMQ_DEFAULT_PASS: followthewhiterabbitneo
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    container_name: promobit_redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ronaldo_promobit
+
+  php:
+    container_name: promobit_php
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/app
+    env_file: 
+      - .env
+    depends_on:
+      - database
+      - mongodb
+      - rabbitmq
+      - redis
+
+volumes:
+  database-data:
+  mongo-data:
+  rabbitmq-data:
+
+# networks: 
+#   default:
+    

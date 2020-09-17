@@ -9,6 +9,9 @@ src/phpunit.xml
 src/bin/.phpunit
 ###< symfony/phpunit-bridge ###
 
+src/testscoverage
+src/supervisord*
+
 src/TESTE
 .env*
 !.env.example
