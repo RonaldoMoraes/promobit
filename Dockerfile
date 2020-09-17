@@ -14,6 +14,7 @@ RUN set -x \
         libxslt-dev \
         libbz2-dev \
         unzip \
+        supervisor \
     && docker-php-ext-install -j$(nproc) pcntl exif soap gd xsl mbstring pdo pdo_mysql zip bz2 bcmath \
     # Install Composer
     && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
@@ -39,7 +40,9 @@ RUN set -x \
     && pecl install mongodb xdebug \
     && docker-php-ext-enable mongodb xdebug
 
+# Copy project files
 ADD ./src /app
+
 
 # HACK for 'symfonycasts/reset-password-bundle'
 ENV DATABASE_URL=none
@@ -52,10 +55,19 @@ ENV PORT=80
 
 WORKDIR /app
 
+# Setting Supervisor config
+RUN mkdir -p /var/log/supervisor \
+  && mkdir -p /etc/supervisor/conf.d
+
+ADD supervisor.conf /etc/supervisor.conf
+
+# Setting entrypoint
 RUN set -x \
     && echo '' > /app/.env \
     && echo '#!/bin/bash' > /entrypoint.sh \
     && echo 'composer install' >> /entrypoint.sh \
+    && echo 'php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction' >> /entrypoint.sh \
+    && echo 'supervisord -c /etc/supervisor.conf &' >> /entrypoint.sh \
     && echo 'cd public/' >> /entrypoint.sh \
     && echo 'php -S 0.0.0.0:$PORT' >> /entrypoint.sh \
     && chmod +x /entrypoint.sh

@@ -100,8 +100,9 @@ class UserTest extends KernelTestCase
         $this->store();
         $user = $this->userMock;
         $users = $this->userRepository->listAll();
+        $length = sizeof($users);
         // dd($users);
-        $this->assertEquals($user['email'], $users[0]['email']);
+        $this->assertEquals($user['email'], $users[$length-1]['email']);
     }
 
     // [ INTEGRATION TEST ]

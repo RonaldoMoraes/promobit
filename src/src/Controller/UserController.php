@@ -46,7 +46,7 @@ class UserController extends AbstractController
      */
     public function store(Request $request): JsonResponse
     {
-        try {
+        // try {
             $data = json_decode($request->getContent(), true);
             $data = array_intersect_key($data, array_flip(['name', 'email', 'phone', 'password']));
             
@@ -61,9 +61,9 @@ class UserController extends AbstractController
             });
 
             return new JsonResponse(['data' => $user], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            return new JsonResponse(['message' => 'User could not be created due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        // } catch (\Exception $e) {
+        //     return new JsonResponse(['message' => 'User could not be created due to an error.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        // }
     }
 
     /**

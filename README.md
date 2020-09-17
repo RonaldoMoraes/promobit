@@ -3,7 +3,7 @@
 </h1>
 
 <h4 align="center"> 
-	Teste 1.0 🗡️ Done!
+	Teste 2.0 🗡️ Done!
 </h4>
 <p align="center">	
 	
@@ -13,15 +13,18 @@
   <a href="https://github.com/RonaldoMoraes/promobit/commits/master">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/RonaldoMoraes/promobit">
   </a>
-
+[![HitCount](http://hits.dwyl.com/RonaldoMoraes/promobit.svg)](http://hits.dwyl.com/RonaldoMoraes/promobit)
   <a>
-    <img alt="Stargazers" src="https://img.shields.io/github/stars/RonaldoMoraes/promobit?style=social">
-  </a>
+
 </p>
+
+[Projeto](https://github.com/RonaldoMoraes/promobit/projects/1) e [branch](https://github.com/RonaldoMoraes/promobit/tree/rc-1.0) da versão com o teste 1.0
+
+[Projeto](https://github.com/RonaldoMoraes/promobit/projects/2) da versão atual 2.0
 
 ## 💻 Aplicação
 
-Projeto: https://github.com/RonaldoMoraes/promobit/projects/1
+Projeto: 
 
 API RESTful com:
 
@@ -30,15 +33,18 @@ API RESTful com:
   - Read
   - Update
   - Delete
-  - List (*brinde)
+  - List
 - Login
-- Recuperação de senha. Página: **localhost:8081/reset-password**
- > Para recuperar a senha é necessário configurar o .env com configs do gmail/mandrill/mailgun
+- [Recuperação de senha](https://promobit.herokuapp.com/reset-password)
+ > Para testar local, o env com o DSN do SendGrid está configurado no arquivo .env.example
 
 Utilizando também de:
 - TDD
 - Autenticação com JWT (stateless)
-- Envio de email (GMail)
+- Envio de email (SendGrid)
+- Armazenamento do token de login num MongoDB, com cache usando Redis
+- Cache com Redis das informações do usuário nos métodos do CRUD, visando agilizar o tempo de resposta no Read
+- CI/CD com Heroku.
 
 ## :rocket: Tecnologias
 
@@ -48,46 +54,33 @@ O teste foi desenvolvido com as seguintes ferramentas:
 - Composer 1.8.4
 - Symfony 5.1
 - PHPUnit 7.5.20
-- MySQL 8 (docker) & Mariadb 10.3.10 (local)
-- Nginx
+- MySQL 5.7
+- Supervisor
+- Redis
+- RabbitMQ
+- MongoDB local e [MongoDB Atlas](https://cloud.mongodb.com/v2) em produção
 - Docker 19.03 & Docker Compose 1.26.2
+- SendGrid
+- Heroku
+
+## :factory: Produção
+1 Cluster de 3-replica-set de MongoDB no Atlas
+
+1 Servidor na Digital Ocean com os containers
+- MySQL
+- RabbitMQ / [Manager](http://ronaldomoraes.com.br:15672/)
+- Redis
+
+1 App no Heroku com
+- [API](https://promobit.herokuapp.com/)
+- Supervisor - Como o Heroku free sleepa a aplicação quando fica sem acesso por um tempo, as vezes o supervisor pode parar de rodar, então, pode haver problemas no worker que manda pra fila do RabbitMQ
+- CI/CD - build & deploy automatizado ao dar push para branch master
 
 ## 🗎 Documentação
 
 [Postman](https://documenter.getpostman.com/view/3747276/TVCgxS4X) - published
 
 Também tem um export da collection do Postman na raiz do projeto chamado [Promobit.postman_collection.json](https://github.com/RonaldoMoraes/promobit/blob/master/Promobit.postman_collection.json)
-
-### Instalar local sem docker 
-
-```bash
-# Clone este repositório
-$ git clone https://github.com/RonaldoMoraes/promobit
-
-# Entre na pasta source do projeto
-$ cd promobit/src
-
-# Instale as dependências
-$ composer install
-
-# Configure as variáveis de ambiente
-$ cp .env.example .env
-
-# Crie o banco de dados
-$ php bin/console doctrine:database:create
-
-# Rode as Migrations
-$ php bin/console doctrine:migrations:migrate
-
-# Baixa e instala o Symfony CLI
-$ curl -sS https://get.symfony.com/cli/installer | bash
-$ mv /root/.symfony/bin/symfony /usr/local/bin/symfony
-
-# Start server com symfony cli
-$ symfony server:start
-
-# Rodando na porta 8000
-```
 
 ### Com docker e docker-compose manualmente
 
@@ -105,40 +98,12 @@ $ cp .env.example .env
 $ cp src/.env.example src/.env
 
 # Rode o docker-compose
-$ docker-compose up -d
+$ docker-compose -f docker-compose.dev.yml up -d
 
-# Rodando na porta 8081
+# Rodando na porta 8080
 ```
 
-### Com docker-compose no script de remake
-
-```bash
-# Clone este repositório
-$ git clone https://github.com/RonaldoMoraes/promobit
-
-# Entre na pasta do projeto
-$ cd promobit
-
-# Configure as variáveis de ambiente
-$ cp .env.example .env
-
-# Configure as variáveis de ambiente
-$ cp src/.env.example src/.env
-
-# Dê permissões de execução ao script
-$ chmod +x docker-rmk.sh
-
-# Rode o script com ou sem "-d" para não ver o log dos containers ou ver, respectivamente
-# Não vê logs
-$ ./docker-rmk.sh -d
-
-# Starta e fica nos logs
-$ ./docker-rmk.sh
-
-# Rodando na porta 8081
-```
-
-### Para executar os testes (necessário phpunit)
+### Para executar os testes (phpunit)
 
 ```bash
 # Clone este repositório
@@ -148,20 +113,18 @@ $ git clone https://github.com/RonaldoMoraes/promobit
 $ cd promobit/src
 
 # Configure as variáveis de ambiente teste
-$ cp .env.example .env.test
+$ cp .env.example .env
 
-# Instala as libs do projeto
-$ composer install
+# Rode o docker-compose
+$ docker-compose -f docker-compose.dev.yml up -d
 
 # Roda os testes
-$ php bin/phpunit
-```
+$ php bin/phpunit --coverage-html testscoverage
 
-### To Do (or should have done)
-- Melhorar (bastante) os testes
-- Implementar teste da listagem de usuários
-- Usar fixtures nos testes
-- Padronizar retorno da API com [JSEND](https://github.com/omniti-labs/jsend)
-- Melhorar validação dos requests (POSTs e PUT)
-- Melhorar variáveis de ambiente dos arquivos docker/compose
-- Para o envio de email, configurar mais DSNs e usar failover
+# Abra a página html gerada para ver o test coverage
+# Windows
+$ start chrome testscoverage/index.html
+# Ubuntu
+$ google-chrome testscoverage/index.html
+
+```
