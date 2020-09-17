@@ -13,7 +13,7 @@
   <a href="https://github.com/RonaldoMoraes/promobit/commits/master">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/RonaldoMoraes/promobit">
   </a>
-[![HitCount](http://hits.dwyl.com/RonaldoMoraes/promobit.svg)](http://hits.dwyl.com/RonaldoMoraes/promobit)
+
   <a>
 
 </p>
@@ -36,7 +36,7 @@ API RESTful com:
   - List
 - Login
 - [Recuperação de senha](https://promobit.herokuapp.com/reset-password)
- > Para testar local, o env com o DSN do SendGrid está configurado no arquivo .env.example
+ > Para testar local, o env com o DSN do SendGrid deve ser corretamente configurado
 
 Utilizando também de:
 - TDD
@@ -64,6 +64,9 @@ O teste foi desenvolvido com as seguintes ferramentas:
 - Heroku
 
 ## :factory: Produção
+<p align="center">
+	<img src="https://raw.githubusercontent.com/RonaldoMoraes/promobit/master/arquitetura.jpg">
+</p>
 1 Cluster de 3-replica-set de MongoDB no Atlas
 
 1 Servidor na Digital Ocean com os containers
