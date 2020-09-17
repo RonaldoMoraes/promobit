@@ -1,0 +1,31 @@
+2020-09-17 01:14:32,293 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2020-09-17 01:14:32,299 INFO supervisord started with pid 38
+2020-09-17 01:14:33,302 INFO spawned: 'amqp-messenger' with pid 42
+2020-09-17 01:14:34,736 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:24:39,708 INFO exited: amqp-messenger (exit status 1; not expected)
+2020-09-17 01:24:40,710 INFO spawned: 'amqp-messenger' with pid 49
+2020-09-17 01:24:41,243 INFO exited: amqp-messenger (exit status 1; not expected)
+2020-09-17 01:24:42,245 INFO spawned: 'amqp-messenger' with pid 56
+2020-09-17 01:24:42,793 INFO exited: amqp-messenger (exit status 1; not expected)
+2020-09-17 01:24:44,796 INFO spawned: 'amqp-messenger' with pid 63
+2020-09-17 01:24:46,106 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:24:46,114 INFO exited: amqp-messenger (exit status 1; not expected)
+2020-09-17 01:24:47,117 INFO spawned: 'amqp-messenger' with pid 70
+2020-09-17 01:24:48,411 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:24:48,420 INFO exited: amqp-messenger (exit status 1; not expected)
+2020-09-17 01:26:20,495 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2020-09-17 01:26:20,501 INFO supervisord started with pid 39
+2020-09-17 01:26:21,503 INFO spawned: 'amqp-messenger' with pid 43
+2020-09-17 01:26:22,990 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:29:12,145 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2020-09-17 01:29:12,153 INFO supervisord started with pid 38
+2020-09-17 01:29:13,156 INFO spawned: 'amqp-messenger' with pid 42
+2020-09-17 01:29:14,157 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:34:05,963 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2020-09-17 01:34:05,968 INFO supervisord started with pid 38
+2020-09-17 01:34:06,971 INFO spawned: 'amqp-messenger' with pid 42
+2020-09-17 01:34:08,455 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2020-09-17 01:38:45,361 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2020-09-17 01:38:45,366 INFO supervisord started with pid 52
+2020-09-17 01:38:46,369 INFO spawned: 'amqp-messenger' with pid 56
+2020-09-17 01:38:47,793 INFO success: amqp-messenger entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

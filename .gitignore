@@ -11,4 +11,4 @@ src/bin/.phpunit
 
 src/TESTE
 .env*
-!.env-example
+!.env.example
